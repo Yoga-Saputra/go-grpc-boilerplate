@@ -18,5 +18,5 @@
 </a>
 </p>
 <p align="center">
-<b>Seamless Wallet</b> is a Microservices of Wallet System for <b>Seamless Mode</b>
+<b>Wallet</b> is a Microservices of Wallet System for <b>Boilerplate</b>
 </p>
