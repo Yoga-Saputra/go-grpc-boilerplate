@@ -1,0 +1,106 @@
+version: '3.9'
+services:
+  # App services
+  app:
+    container_name: app
+    build:
+      context: .
+    working_dir: /seamless-wallet
+    volumes:
+      - ./:/seamless-wallet
+    command: tail -f /dev/null
+    ports:
+      - 3939:3939
+    depends_on:
+      # - db-postgres
+      - redis
+
+  # PostgreSQL
+  # db-postgres:
+  #   container_name: db_postgres
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.postgres
+  #   image: postgres_pg_partman
+  #   restart: unless-stopped
+  #   env_file:
+  #     - ./.docker/db-postgres.env
+  #   volumes:
+  #     - db_postgres:/var/lib/postgresql/data/pgdata
+  #   ports:
+  #     - 5434:5432
+
+  # Redis for local queue and cache
+  redis:
+    container_name: redis
+    image: redis:alpine
+    restart: unless-stopped
+    ports:
+      - 6381:6379
+
+  # Zookeeper
+  # zookeeper:
+  #   image: confluentinc/cp-zookeeper:7.2.2
+  #   ports:
+  #     - 22181:2181
+  #   environment:
+  #     - ZOOKEEPER_CLIENT_PORT=2181
+  #     - ZOOKEEPER_TICK_TIME=2000
+
+  # Kafka 1
+  # kafka-1:
+  #   image: confluentinc/cp-kafka:7.2.2
+  #   ports:
+  #     - 29092:29092
+  #   environment:
+  #     - KAFKA_BROKER_ID=1
+  #     - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+  #     - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-1:9092,PLAINTEXT_HOST://localhost:29092
+  #     - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+  #     - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+  #     - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+  #     - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+  #   depends_on:
+  #     - zookeeper
+
+  # Kafka 2
+  # kafka-2:
+  #   image: confluentinc/cp-kafka:7.2.2
+  #   ports:
+  #     - 39092:39092
+  #   environment:
+  #     - KAFKA_BROKER_ID=2
+  #     - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+  #     - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka-2:9092,PLAINTEXT_HOST://localhost:39092
+  #     - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+  #     - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+  #     - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+  #     - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+  #   depends_on:
+  #     - zookeeper
+
+  # Local queue monitoring
+  asynqmon:
+    container_name: asynqmon
+    image: hibiken/asynqmon:latest
+    environment:
+      - REDIS_ADDR=redis:6379
+      - ENABLE_METRICS_EXPORTER=true
+    restart: always
+    ports:
+      - 8083:8080
+
+  # DB Management Tool
+  # adminer:
+  #   container_name: adminer
+  #   image: adminer:latest
+  #   restart: always
+  #   ports:
+  #     - 8081:8080
+
+# volumes:
+  # db_postgres:
+
+networks:
+  default:
+    name: shared-net

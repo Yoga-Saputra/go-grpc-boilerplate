@@ -1,0 +1,24 @@
+# systemd service for managing all go-grpc-boilerplate service on this system.
+[Unit]
+Description=go-grpc-boilerplate System Service
+
+ConditionPathExists=/usr/sbin/go-grpc-boilerplate
+ConditionPathIsDirectory=/etc/go-grpc-boilerplate
+ConditionPathExists=/etc/rsyslog.d/syslog-go-grpc-boilerplate.conf
+ConditionPathIsDirectory=/var/log/go-grpc-boilerplate
+
+After=network.target postgresql.service redis-server.service
+Wants=network-online.target postgresql.service redis-server.service
+
+[Service]
+Type=simple
+pIdFile=/run/go-grpc-boilerplate.pId
+Restart=on-failure
+RestartSec=10
+WorkingDirectory=/etc/go-grpc-boilerplate
+ExecStart=/usr/sbin/go-grpc-boilerplate --run
+Environment=debug_option
+LimitNOFILE=100000
+
+[Install]
+WantedBy=multi-user.target
