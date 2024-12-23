@@ -52,7 +52,7 @@ queue:
     concurrency: 50
     shutdownTimeout: 10
     healthCheckInterval: 15
-    strictPriority: false
+    strictPriority: true
 
   redis:
     host: 127.0.0.1
